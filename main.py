@@ -17,18 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/calcular")
-async def calcular(request: Request):
-    data = await request.json()
-    resultado = calcular_flujo_fotovoltaico(data)
-    return resultado
-
-@app.post("/cotizar")
-async def cotizar(request: Request):
-    data = await request.json()
-    resultado = calcular_cotizacion_proyecto(data)
-    return resultado
-
 @app.post("/procesar-factura")
 async def procesar_factura(
     file: UploadFile = File(...),
@@ -38,3 +26,19 @@ async def procesar_factura(
     tipoInversor: str = Form(...)
 ):
     return procesar_factura_pdf(file.file, estructura, cubierta, ubicacion, tipoInversor)
+
+
+@app.post("/calcular")
+async def calcular(request: Request):
+    data = await request.json()
+    resultado = calcular_flujo_fotovoltaico(data)
+    return resultado
+
+"""""
+@app.post("/cotizar")
+async def cotizar(request: Request):
+    data = await request.json()
+    resultado = calcular_cotizacion_proyecto(data)
+    return resultado
+"""""
+

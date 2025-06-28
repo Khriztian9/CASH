@@ -41,6 +41,15 @@ def calcular_flujo_fotovoltaico(data):
     vpn = npv(tasa_descuento, flujos)
     tir = irr(flujos)
 
+        # Calcular año de recuperación (cuando el flujo acumulado pasa de negativo a positivo)
+    flujo_acumulado = 0
+    payback_year = None
+    for i, f in enumerate(flujos):
+        flujo_acumulado += f
+        if flujo_acumulado >= 0:
+            payback_year = i
+            break
+
     return {
         "vpn": round(vpn, 2),
         "tir": round(tir * 100, 2),
@@ -48,5 +57,7 @@ def calcular_flujo_fotovoltaico(data):
         "autoconsumo_kwh": round(autoconsumo_kwh, 2),
         "excedente1_kwh": round(excedente1_kwh, 2),
         "excedente2_kwh": round(excedente2_kwh, 2),
-        "flujos": flujos
+        "flujos": flujos,
+        "payback_year": payback_year,
+
     }
