@@ -76,7 +76,7 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
 
         inversor = min(inversores, key=lambda inv: abs(inv["potencia"] - potencia_kwp))
 
-        precio_base_kwp = 3_800_000 if tipo_inversor == "ongrid" else 7_200_000
+        precio_base_kwp = 4_200_000 if tipo_inversor == "ongrid" else 7_200_000
         valor_base = potencia_kwp * precio_base_kwp
 
         factores_cubierta = {'trapezoidal': 0.0, 'teja_colonial': 0.2, 'fibrocemento': 0.1}
