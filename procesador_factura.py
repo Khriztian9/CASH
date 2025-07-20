@@ -32,18 +32,18 @@ inversores = [
 
 def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
     with pdfplumber.open(file) as pdf:
-        texto = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
         page0_words = pdf.pages[0].extract_words()
-
         meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"]
         consumos = []
 
-        for i, palabra in enumerate(page0_words):
-            if palabra["text"].upper()[:3] in meses:
-                if i + 1 < len(page0_words):
-                    valor = page0_words[i + 1]["text"].replace(".", "").replace(",", "")
-                    if valor.isdigit():
-                        consumos.append(int(valor))
+        for i in range(len(page0_words) - 1):
+            mes = page0_words[i]["text"].strip().upper()
+            siguiente = page0_words[i + 1]["text"].strip()
+            if mes in meses:
+                valor = siguiente.replace(".", "").replace(",", "")
+                if valor.isdigit():
+                    consumos.append(int(valor))
+
 
         if not consumos:
             return {"error": "No se encontraron consumos mensuales en la factura para calcular el promedio."}
@@ -56,7 +56,7 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
 
         nombre     = extraer_por_posicion(page0_words, 10, 200, 30, 40)
         direccion  = extraer_por_posicion(page0_words, 10, 220, 42, 53)
-        municipio  = extraer_por_posicion(page0_words, 140, 180, 63, 70)
+        municipio  = extraer_por_posicion(page0_words, 120, 180, 60, 70)
         estrato    = extraer_por_posicion(page0_words, 250, 270, 76, 85)
 
         tipo_servicio_texto = extraer_por_posicion(page0_words, 200, 240, 63, 70).lower()
