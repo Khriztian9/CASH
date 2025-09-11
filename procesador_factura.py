@@ -1,4 +1,3 @@
-
 import math
 import re
 import pdfplumber
@@ -30,12 +29,16 @@ inversores = [
     {"serie": "GT3", "modelo": "GT3-30KL-Q", "potencia": 30.0}
 ]
 
-def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
+def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor, porcentaje_generacion: int = 100):
+    """
+    porcentaje_generacion: entero 50, 100, 150 o 200 que representa la cobertura deseada del consumo.
+    """
     with pdfplumber.open(file) as pdf:
         page0_words = pdf.pages[0].extract_words()
         meses = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"]
         consumos = []
 
+        # Extraer consumos mensuales
         for i in range(len(page0_words) - 1):
             mes = page0_words[i]["text"].strip().upper()
             siguiente = page0_words[i + 1]["text"].strip()
@@ -43,7 +46,6 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
                 valor = siguiente.replace(".", "").replace(",", "")
                 if valor.isdigit():
                     consumos.append(int(valor))
-
 
         if not consumos:
             return {"error": "No se encontraron consumos mensuales en la factura para calcular el promedio."}
@@ -69,27 +71,46 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
         else:
             tipo_servicio = "No disponible"
 
+        # Parámetros Colombia
         hsp = 4.5
         eficiencia = 0.85
-        consumo_diario = consumo_prom / 30
-        potencia_kwp = round(consumo_diario / (hsp * eficiencia), 2)
 
+        consumo_diario = consumo_prom / 30.0
+        potencia_kwp_base = consumo_diario / (hsp * eficiencia)
+
+        # Cobertura (%)
+        try:
+            pct = int(porcentaje_generacion)
+        except:
+            pct = 100
+        if pct not in (50, 100, 150, 200):
+            pct = 100
+        factor_cobertura = pct / 100.0
+        potencia_kwp = round(potencia_kwp_base * factor_cobertura, 2)
+
+        # Selección del inversor más cercano
         inversor = min(inversores, key=lambda inv: abs(inv["potencia"] - potencia_kwp))
 
-        precio_base_kwp = 3_800_000 if tipo_inversor == "ongrid" else 7_200_000
+        # Precio
+        precio_base_kwp = 4_300_000 if tipo_inversor == "ongrid" else 7_600_000
         valor_base = potencia_kwp * precio_base_kwp
 
         factores_cubierta = {'trapezoidal': 0.0, 'teja_colonial': 0.2, 'fibrocemento': 0.1}
-        factores_estructura = {'madera': 0.25, 'cercha': 0.25, 'plancha': 0, 'granja': 0.2, 'perfil_metalico': 0.05}
+        factores_estructura = {'madera': 0.2, 'cercha': 0.2, 'plancha': 0, 'granja': 0.2, 'perfil_metalico': 0.05}
         factores_ubicacion = {'risaralda': 0.0, 'valle': 0.2, 'quindio': 0.15, 'caldas': 0.1}
 
-        factor_total = 1 +                        factores_estructura.get(estructura.lower(), 0) +                        factores_cubierta.get(cubierta.lower(), 0) +                        factores_ubicacion.get(ubicacion.lower(), 0)
+        factor_total = 1 + \
+            factores_estructura.get(estructura.lower(), 0) + \
+            factores_cubierta.get(cubierta.lower(), 0) + \
+            factores_ubicacion.get(ubicacion.lower(), 0)
 
         precio_total = round(valor_base * factor_total)
 
+        # Paneles
         panel_watt = 580
         numero_paneles = math.ceil(potencia_kwp * 1000 / panel_watt)
 
+        # Valor kWh de la factura
         def extraer_valor_kwh(words):
             for i in range(len(words) - 1):
                 actual = words[i]["text"].replace(",", "").strip()
@@ -114,10 +135,11 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
         valor_energia = consumo_prom * valor_kwh if valor_kwh else 0
         valor_contribucion = round(0.2 * valor_energia) if aplica_contribucion else 0
 
-        generacion_min = round(potencia_kwp * 1400)/12
-        generacion_max = round(potencia_kwp * 1600)/12
+        # Generación mensual estimada (ajustada a cobertura)
+        generacion_min = round(potencia_kwp * 1300) / 12
+        generacion_max = round(potencia_kwp * 1600) / 12
 
-        costo_energia = valor_kwh* consumo_prom*12 + valor_contribucion*12
+        costo_energia = (valor_kwh or 0) * consumo_prom * 12 + valor_contribucion * 12
 
         return {
             "nombre": nombre,
@@ -134,5 +156,6 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor):
             "generacion_mensual_min": generacion_min,
             "generacion_mensual_max": generacion_max,
             "inversor_utilizado": f"{inversor['modelo']} ({inversor['potencia']} kW)",
-            "costo_energia": costo_energia
+            "costo_energia": costo_energia,
+            "porcentaje_generacion": pct
         }
