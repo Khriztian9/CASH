@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from modelo_financiero import calcular_flujo_fotovoltaico
-from Procesador_factura import procesar_factura_pdf
+from procesador_factura import procesar_factura_pdf
 
 app = FastAPI()
 
