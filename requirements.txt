@@ -1,6 +1,6 @@
 fastapi==0.97.0
 uvicorn==0.27.0.post1
-numpy==2.3.0
+numpy==1.26.4
 numpy-financial==1.0.0
 pandas==2.3.0
 matplotlib==3.10.6
