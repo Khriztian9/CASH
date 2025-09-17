@@ -97,8 +97,8 @@ def procesar_factura_pdf(file, estructura, cubierta, ubicacion, tipo_inversor, p
         else:
             precios_servicio = {
                 "residencial": 4_300_000,
-                "comercial": 3_800_000,
-                "industrial": 3_300_000
+                "comercial": 4_200_000,
+                "industrial": 3_600_000
             }
             precio_base_kwp = precios_servicio.get(tipo_servicio.lower(), 4_300_000)
 
