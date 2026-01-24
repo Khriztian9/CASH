@@ -30,7 +30,8 @@ inversores = [
     {"serie": "GT3", "modelo": "GT3-30KL-Q", "potencia": 30.0},
     {"serie": "GT3", "modelo": "GT3-50K-Q", "potencia": 50.0},
     {"serie": "GT3", "modelo": "GT3-60K-Q", "potencia": 60.0},
-    {"serie": "GT3", "modelo": "GT3-100K", "potencia": 100.0}
+    {"serie": "GT3", "modelo": "GT3-100K", "potencia": 100.0},
+    {"serie": "GT3", "modelo": "GT3-125K", "potencia": 125.0}
 ]
 
 # ------------------- Utilidades de extracción -------------------
@@ -104,7 +105,7 @@ def _calculos_colombia(consumo_prom, tipo_servicio, tipo_inversor, estructura, c
     if (tipo_inversor or "").lower() == "hibrido":
         precio_base_kwp = 7_600_000
     else:
-        precios_servicio = {"residencial": 4_300_000, "comercial": 4_200_000, "industrial": 3_600_000}
+        precios_servicio = {"residencial": 4_300_000, "comercial": 4_100_000, "industrial": 3_300_000}
         precio_base_kwp = precios_servicio.get((tipo_servicio or "").lower(), 4_300_000)
 
     valor_base = potencia_kwp * precio_base_kwp
