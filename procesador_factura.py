@@ -27,7 +27,10 @@ inversores = [
     {"serie": "GT3", "modelo": "GT3-17KL-D", "potencia": 17.0},
     {"serie": "GT3", "modelo": "GT3-20KL-T", "potencia": 20.0},
     {"serie": "GT3", "modelo": "GT3-25KL-T", "potencia": 25.0},
-    {"serie": "GT3", "modelo": "GT3-30KL-Q", "potencia": 30.0}
+    {"serie": "GT3", "modelo": "GT3-30KL-Q", "potencia": 30.0},
+    {"serie": "GT3", "modelo": "GT3-50K-Q", "potencia": 50.0},
+    {"serie": "GT3", "modelo": "GT3-60K-Q", "potencia": 60.0},
+    {"serie": "GT3", "modelo": "GT3-100K", "potencia": 100.0}
 ]
 
 # ------------------- Utilidades de extracción -------------------
@@ -73,9 +76,9 @@ def extraer_valor_kwh(words) -> Optional[float]:
     return None
 
 # ------------------- Núcleo común Colombia -------------------
-FACTORES_CUBIERTA = {'trapezoidal': 0.0, 'teja_colonial': 0.2, 'fibrocemento': 0.1}
+FACTORES_CUBIERTA = {'trapezoidal': 0.0, 'teja_colonial': 0.2, 'fibrocemento': 0.1,'grafada': 0.0,}
 FACTORES_ESTRUCTURA = {'madera': 0.2, 'cercha': 0.1, 'plancha': 0.0, 'granja': 0.2, 'perfil_metalico': 0.05}
-FACTORES_UBICACION = {'risaralda': 0.0, 'valle': 0.2, 'quindio': 0.15, 'caldas': 0.1}
+FACTORES_UBICACION = {'risaralda': 0.0, 'valle': 0.2, 'quindio': 0.15, 'caldas': 0.1, 'antioquia': 0.2}
 
 def _calculos_colombia(consumo_prom, tipo_servicio, tipo_inversor, estructura, cubierta, ubicacion, porcentaje_generacion):
     # Parámetros base
