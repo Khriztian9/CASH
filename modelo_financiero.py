@@ -64,6 +64,8 @@ def calcular_flujo_fotovoltaico(data):
     # Tabla resultados (sin Flujo Neto ni Flujo Acumulado)
     registros = []
 
+    
+
     for anio in range(1, horizonte_anios + 1):
         # 📉 Degradación de módulos FV
         generacion_anual_kwh = generacion_inicial * ((1 - 0.005) ** (anio - 1))
@@ -91,8 +93,8 @@ def calcular_flujo_fotovoltaico(data):
         flujo_base = ingreso_total - opex_anual
 
         # Beneficios
-        beneficio_depreciacion = depreciacion_anual if anio <= 3 else 0
-        beneficio_renta = deduccion_anual_renta if anio <= anios_deduccion_renta else 0
+        beneficio_depreciacion = depreciacion_anual if (2 <= anio <= 4) else 0
+        beneficio_renta = deduccion_anual_renta if (2 <= anio <= anios_deduccion_renta + 1) else 0
 
         # Leasing
         costo_leasing = cuota_leasing if anio <= anios_leasing else 0
